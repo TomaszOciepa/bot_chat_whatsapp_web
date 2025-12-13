@@ -30,3 +30,14 @@ After installing dependencies, start the bot with:
 ```bash
 node index.js
 ```
+
+
+## 📌  If You have a problem with starting.
+
+Problem with running the Bot in macOs and Chrome.
+
+Install Puppeteera
+
+```bash
+npm install puppeteer
+```

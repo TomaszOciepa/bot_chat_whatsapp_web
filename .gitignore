@@ -1,0 +1,78 @@
+# ==============================
+# System / Editor
+# ==============================
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
+
+# ==============================
+# Bundler / Ruby
+# ==============================
+/.bundle
+/vendor/bundle
+
+# ==============================
+# Rails
+# ==============================
+# Logs and temp files
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+/tmp/pids/*
+!/tmp/pids/.keep
+
+# Uploaded files (ActiveStorage)
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Assets
+/public/assets
+/node_modules
+
+# SQLite database (development)
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+# Master key / credentials
+/config/master.key
+/config/credentials/*.key
+
+# Coverage reports
+/coverage/
+
+# Byebug history
+.byebug_history
+
+# ==============================
+# Environment / Secrets
+# ==============================
+# .env*
+.env
+.envrc
+.env.local
+
+# ==============================
+# Docker
+# ==============================
+docker-compose.override.yml
+*.log
+
+# ==============================
+# Kamal (deploy)
+# ==============================
+/.kamal/tmp
+.kamal/.lock
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+# WhatsApp Web JS cache/auth
+.wwebjs_cache/
+.wwebjs_auth/
+

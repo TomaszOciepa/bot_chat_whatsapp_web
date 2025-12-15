@@ -33,7 +33,7 @@ client.on('message', async (message) => {
   console.log(`📩 ${message.from}: ${message.body}`);
 
   try {
-    await axios.post('http://localhost:3000/messages', {
+    await axios.post('http://localhost:3009/api/messages', {
       from: message.from,
       body: message.body
     });
@@ -70,6 +70,6 @@ app.post('/send', async (req, res) => {
   }
 });
 
-app.listen(3005, () => {
-  console.log('🌐 Node WhatsApp API listening on http://localhost:3005');
+app.listen(3008, () => {
+  console.log('🌐 Node WhatsApp API listening on http://localhost:3008');
 });

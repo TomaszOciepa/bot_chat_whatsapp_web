@@ -1,4 +1,5 @@
 require('dotenv').config();
+const QRCode = require('qrcode');
 const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
@@ -12,11 +13,33 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
+function requireQrAuth(req, res, next) {
+  const auth = req.headers.authorization;
+
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="QR Access"');
+    return res.status(401).send('Authentication required');
+  }
+
+  const base64Credentials = auth.split(' ')[1];
+  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
+  const [username, password] = credentials.split(':');
+
+  // username ignorujemy, sprawdzamy tylko hasło
+  if (password !== process.env.QR_PASSWORD) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="QR Access"');
+    return res.status(401).send('Invalid credentials');
+  }
+
+  next();
+}
+
+
 app.get('/', (req, res) => {
   res.send('✅ WhatsApp bot running');
 });
 
-app.get('/qr', (req, res) => {
+app.get('/qr', requireQrAuth, async (req, res) => {
   if (isReady) {
     return res.send('✅ WhatsApp already authenticated');
   }
@@ -25,8 +48,21 @@ app.get('/qr', (req, res) => {
     return res.send('⏳ QR not ready yet, refresh in a moment');
   }
 
-  res.type('text/plain').send(latestQr);
+  try {
+    const png = await QRCode.toBuffer(latestQr, {
+      type: 'png',
+      width: 300,
+      margin: 2
+    });
+
+    res.setHeader('Content-Type', 'image/png');
+    res.send(png);
+  } catch (err) {
+    res.status(500).send('❌ Failed to generate QR');
+  }
 });
+
+
 
 const client = new Client({
   authStrategy: new LocalAuth(),

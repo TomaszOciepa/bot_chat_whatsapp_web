@@ -63,6 +63,7 @@ app.post('/send', async (req, res) => {
 
   try {
     await client.sendMessage(to, message);
+    console.log(`📩 ${to}: ${message}`);
     res.json({ status: 'sent' });
   } catch (error) {
     console.error('❌ Send error:', error.message);

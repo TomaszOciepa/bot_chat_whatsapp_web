@@ -1,42 +1,63 @@
+require('dotenv').config();
 const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
 
 //
-// --- WHATSAPP CLIENT ---
+// ===== EXPRESS =====
 //
+const app = express();
+app.use(express.json());
 
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('✅ WhatsApp bot running');
+});
+
+//
+// ===== WHATSAPP CLIENT =====
+//
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
-    headless: true
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu'
+    ]
   }
 });
 
 client.on('qr', (qr) => {
-  console.log('Zeskanuj QR kod:');
+  console.log('📱 Zeskanuj QR kod:');
   qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
-  console.log('🤖 Bot gotowy!');
+  console.log('🤖 WhatsApp bot gotowy!');
 });
 
 //
-// --- ODBIÓR WIADOMOŚCI (NIGDY NIE WYSYŁAMY TU ODPOWIEDZI) ---
+// ===== ODBIÓR WIADOMOŚCI (Node → Rails) =====
 //
-
 client.on('message', async (message) => {
   if (message.fromMe) return;
 
   console.log(`📩 ${message.from}: ${message.body}`);
 
   try {
-    await axios.post('http://localhost:3009/api/messages', {
-      from: message.from,
-      body: message.body
-    });
+    await axios.post(
+      process.env.RAILS_WEBHOOK_URL, // 👈 ENV
+      {
+        from: message.from,
+        body: message.body
+      },
+      { timeout: 5000 }
+    );
   } catch (error) {
     console.error('❌ Błąd wysyłania do Rails:', error.message);
   }
@@ -45,14 +66,7 @@ client.on('message', async (message) => {
 client.initialize();
 
 //
-// --- EXPRESS API (TYLKO DO WYSYŁANIA WIADOMOŚCI) ---
-//
-
-const app = express();
-app.use(express.json());
-
-//
-// Rails → Node → WhatsApp
+// ===== Rails → Node → WhatsApp =====
 //
 app.post('/send', async (req, res) => {
   const { to, message } = req.body;
@@ -63,7 +77,7 @@ app.post('/send', async (req, res) => {
 
   try {
     await client.sendMessage(to, message);
-    console.log(`📩 ${to}: ${message}`);
+    console.log(`📤 ${to}: ${message}`);
     res.json({ status: 'sent' });
   } catch (error) {
     console.error('❌ Send error:', error.message);
@@ -71,6 +85,9 @@ app.post('/send', async (req, res) => {
   }
 });
 
-app.listen(3008, () => {
-  console.log('🌐 Node WhatsApp API listening on http://localhost:3008');
+//
+// ===== START SERVER =====
+//
+app.listen(PORT, () => {
+  console.log(`🌐 Node WhatsApp API listening on port ${PORT}`);
 });

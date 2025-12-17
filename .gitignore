@@ -75,4 +75,4 @@ docker-compose.override.yml
 # WhatsApp Web JS cache/auth
 .wwebjs_cache/
 .wwebjs_auth/
-
+.session/

@@ -4,13 +4,14 @@
   "description": "This project uses **whatsapp-web.js** to communicate with WhatsApp (send messages, receive messages, maintain sessions, etc.).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "puppeteer": "^24.33.0",
     "qrcode-terminal": "^0.12.0",

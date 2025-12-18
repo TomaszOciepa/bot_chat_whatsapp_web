@@ -92,6 +92,8 @@ client.on('ready', () => {
 client.on('message', async (message) => {
   if (message.fromMe) return;
 
+   console.log(`📩 WhatsApp: ${message.from} → ${message.body || '[brak treści]'}`);
+
   try {
     await axios.post(process.env.RAILS_WEBHOOK_URL, {
       from: message.from,
@@ -110,6 +112,8 @@ app.post('/send', async (req, res) => {
   if (!to || !message) {
     return res.status(400).json({ error: 'Missing to or message' });
   }
+
+  console.log(`📤 WhatsApp SEND → ${to}: ${message}`);
 
   try {
     await client.sendMessage(to, message);
